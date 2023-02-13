@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  back:
+    container_name: 'app_backend'
+    build:
+      context: .
+    restart: on-failure
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    command:
+      - './start.sh'
+    networks:
+      - app
+
+  postgres:
+    container_name: 'app_db'
+    image: postgres:alpine
+    env_file:
+      - .env
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./dumps:/app/dumps
+      - ./data/app_db:/var/lib/app_db/data
+    networks:
+      - app
+
+networks:
+  app:
+
