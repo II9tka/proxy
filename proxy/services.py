@@ -13,12 +13,14 @@ from .utils import retry_if_connection_error, update_html
 @retry(retry_on_exception=retry_if_connection_error, wait_fixed=2000)
 def get_proxy_response(request: WSGIRequest) -> ProxyResponse:
     headers = {
-        "cookie": "R3ACTLB=f8cb235b9e4dbb76f6522827fd366ec1;",
-        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+        "user-agent": request.META['HTTP_USER_AGENT'],
+    }
+    cookies = {
+        'R3ACTLB': 'f8cb235b9e4dbb76f6522827fd366ec1'
     }
 
     try:
-        response = requests.get(settings.PROXY_URL + request.path, headers=headers, timeout=2)
+        response = requests.get(settings.PROXY_URL + request.path, headers=headers, timeout=5, cookies=cookies)
 
         if response.status_code > 499:
             raise ConnectionError()
